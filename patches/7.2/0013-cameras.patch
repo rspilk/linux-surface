@@ -1,4 +1,4 @@
-From 1791e8ede3d2a043040d3d17a4cf06067967d678 Mon Sep 17 00:00:00 2001
+From 52eea185b00ab8b317d2eb0a220463f730dddd40 Mon Sep 17 00:00:00 2001
 From: Hans de Goede <hdegoede@redhat.com>
 Date: Sun, 10 Oct 2021 20:56:57 +0200
 Subject: [PATCH] ACPI: delay enumeration of devices with a _DEP pointing to an
@@ -72,7 +72,7 @@ index 2d7e7ff78..d2536b8fb 100644
  	 * Do not enumerate devices with enumeration_by_parent flag set as
  	 * they will be enumerated by their respective parents.
 
-From b116760b90296772b8d85461e5c032818d80512c Mon Sep 17 00:00:00 2001
+From 3a854e61cb23f044c744f188e8b6f76bd7d954c0 Mon Sep 17 00:00:00 2001
 From: zouxiaoh <xiaohong.zou@intel.com>
 Date: Fri, 25 Jun 2021 08:52:59 +0800
 Subject: [PATCH] iommu: intel-ipu: use IOMMU passthrough mode for Intel IPUs
@@ -180,7 +180,7 @@ index 90f76cbb5..6cae692b0 100644
  DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x9D3E, quirk_iommu_ipts);
  DECLARE_PCI_FIXUP_HEADER(PCI_VENDOR_ID_INTEL, 0x34E4, quirk_iommu_ipts);
 
-From 3b2768f80456dea76d22f68f3fdab482abdff017 Mon Sep 17 00:00:00 2001
+From 9d5374cab8b3421d34783866f6feb5ac03da7b70 Mon Sep 17 00:00:00 2001
 From: Daniel Scally <djrscally@gmail.com>
 Date: Sun, 10 Oct 2021 20:57:02 +0200
 Subject: [PATCH] platform/x86: int3472: Enable I2c daisy chain
@@ -215,7 +215,7 @@ index a77ed32ab..3ef46bace 100644
  
  	return 0;
 
-From 0887475312d50d229c54c475ae52b6c09b21c2b5 Mon Sep 17 00:00:00 2001
+From ec4cbb48c4c7fbc3bd6fa22d7857465c162a09d5 Mon Sep 17 00:00:00 2001
 From: Daniel Scally <dan.scally@ideasonboard.com>
 Date: Tue, 21 Mar 2023 13:45:26 +0000
 Subject: [PATCH] media: i2c: Clarify that gain is Analogue gain in OV7251
@@ -252,7 +252,7 @@ index 311c61d9e..a1a91b41e 100644
  				     V4L2_CID_TEST_PATTERN,
  				     ARRAY_SIZE(ov7251_test_pattern_menu) - 1,
 
-From 245605e64a20a1360ece1543970db2d266746528 Mon Sep 17 00:00:00 2001
+From cc5010b7d661200e2acb49ac0e1f8710a89ef939 Mon Sep 17 00:00:00 2001
 From: Daniel Scally <dan.scally@ideasonboard.com>
 Date: Wed, 22 Mar 2023 11:01:42 +0000
 Subject: [PATCH] media: v4l2-core: Acquire privacy led in
@@ -301,7 +301,7 @@ index 570df3c41..8e9ae4b81 100644
  	if (ret < 0)
  		goto out_cleanup;
 
-From 1db4b0c68001695762b9d15475168b85102431a5 Mon Sep 17 00:00:00 2001
+From 3ff312e15ac22b3a98d040d400bd9990b39307eb Mon Sep 17 00:00:00 2001
 From: Kate Hsuan <hpa@redhat.com>
 Date: Tue, 21 Mar 2023 23:37:16 +0800
 Subject: [PATCH] platform: x86: int3472: Add MFD cell for tps68470 LED
@@ -342,7 +342,7 @@ index 3ef46bace..e9b3a8a56 100644
  		for (i = 0; i < board_data->n_gpiod_lookups; i++)
  			gpiod_add_lookup_table(board_data->tps68470_gpio_lookup_tables[i]);
 
-From 0c64beba42677179bf3a3cd4bab8945bc28ca48b Mon Sep 17 00:00:00 2001
+From 1ef1837a7c935233ba0241563bbad5eea962576c Mon Sep 17 00:00:00 2001
 From: Kate Hsuan <hpa@redhat.com>
 Date: Tue, 21 Mar 2023 23:37:17 +0800
 Subject: [PATCH] include: mfd: tps68470: Add masks for LEDA and LEDB
@@ -381,7 +381,7 @@ index 7807fa329..2d2abb25b 100644
 +
  #endif /* __LINUX_MFD_TPS68470_H */
 
-From d4a96b2e7573ce82ec0d348b1b6d439d823d5569 Mon Sep 17 00:00:00 2001
+From ec0d276998a725f9a81656a240d65dfd48c1b225 Mon Sep 17 00:00:00 2001
 From: Kate Hsuan <hpa@redhat.com>
 Date: Tue, 21 Mar 2023 23:37:18 +0800
 Subject: [PATCH] leds: tps68470: Add LED control for tps68470
@@ -630,7 +630,7 @@ index 000000000..35aeb5db8
 +MODULE_DESCRIPTION("LED driver for TPS68470 PMIC");
 +MODULE_LICENSE("GPL v2");
 
-From 1c3e7926b9e85faba8e6503fe54939bfc28d6688 Mon Sep 17 00:00:00 2001
+From 47b597126ccb1709304bb6f6e79a4a2c7545205a Mon Sep 17 00:00:00 2001
 From: mojyack <mojyack@gmail.com>
 Date: Tue, 26 Mar 2024 05:55:44 +0900
 Subject: [PATCH] media: i2c: dw9719: fix probe error on surface go 2
@@ -660,7 +660,7 @@ index 3b7ba88fd..440888507 100644
  	 * Need 100us to transition from SHUTDOWN to STANDBY.
  	 * Jiggle the SCL pin to wake up the device (even when the regulator is
 
-From 633863a9814055987cab2d3a53402ee50e205366 Mon Sep 17 00:00:00 2001
+From 302136de26530bb1e4c2b084ff105e85fd2c78e0 Mon Sep 17 00:00:00 2001
 From: Tooraj Taraz <tooraj.taraz@yahoo.com>
 Date: Wed, 31 Dec 2025 00:35:50 +0100
 Subject: [PATCH] Add camera support for Surface Pro 9
@@ -999,7 +999,7 @@ index 749e2e323..68555b4a1 100644
  			ret = -EINVAL;
  			break;
 
-From d0f193a8021926f36cc927b2208ce97ce29a3225 Mon Sep 17 00:00:00 2001
+From f7139cde2ebad48a571d432b341b2c3ba6cc193e Mon Sep 17 00:00:00 2001
 From: gabrielstedman <gabrielstedman@users.noreply.github.com>
 Date: Fri, 13 Mar 2026 08:52:07 +0000
 Subject: [PATCH] media: ipu-bridge: Add front camera rotation quirks for
@@ -1040,3 +1040,81 @@ index ed16151ce..6f17599ac 100644
  	{} /* Terminating entry */
  };
  
+
+From 8f78932e7570c21e891ec53bbd3d83b99e1dc331 Mon Sep 17 00:00:00 2001
+From: Arsalan Naeem <naeemarsalan@gmail.com>
+Date: Thu, 11 Jun 2026 17:30:22 -0400
+Subject: [PATCH] media: i2c: ov5693: program MIPI_CTRL00 for IPU6 (Surface Pro
+ 8/9 and Go 4 front cameras)
+
+The mainline ov5693 driver never writes MIPI_CTRL00 (register 0x4800),
+leaving it at its 0x00 power-on default. That default is accepted by the
+IPU3 ISP, where this sensor is used as the front camera on the Surface
+Pro 5/6/7, so the sensor works there. On the Surface Pro 8 the same
+sensor is wired to an IPU6 whose MIPI D-PHY does not lock onto the link
+with MIPI_CTRL00 == 0x00: the sensor reports streaming and the PHY powers
+up, but the receiver never gets any CSI-2 packets and capture times out
+("stream stop time out", zero packets, no SOT/CRC errors).
+
+Writing MIPI_CTRL00 = 0x2d before stream-on -- the value the vendor
+(Windows) driver programs for this module -- configures the CSI-2
+clock-lane behaviour the IPU6 expects, and the front camera then streams
+(verified at ~28 fps via libcamera on a Surface Pro 8, kernel 6.19).
+
+The same write has since been confirmed to fix the identical symptom on
+the other IPU6 Surface devices that use this sensor as the front camera:
+the Surface Go 4 (ov5693 at INT33BE, ~28.6 fps) and the Surface Pro 9
+(ov5693 at OVTI5693; that ACPI HID is already added by the "Add camera
+support for Surface Pro 9" patch earlier in this patchset, so no match
+table change is needed here).
+
+The value was reverse-engineered from the Surface Pro 8 Windows ov5693.sys
+register table; its exact bit meaning is taken from the vendor driver
+rather than a datasheet. It is written unconditionally, so it should be
+checked on the IPU3 Surface devices (Pro 5/6/7) before this is relied
+upon there.
+
+Link: https://github.com/linux-surface/linux-surface/issues/1893
+Link: https://github.com/linux-surface/linux-surface/issues/2154
+Link: https://github.com/linux-surface/linux-surface/issues/1892
+Patchset: cameras
+Signed-off-by: Arsalan Naeem <naeemarsalan@gmail.com>
+---
+ drivers/media/i2c/ov5693.c | 17 +++++++++++++++++
+ 1 file changed, 17 insertions(+)
+
+diff --git a/drivers/media/i2c/ov5693.c b/drivers/media/i2c/ov5693.c
+index 02236f3db..532b92f70 100644
+--- a/drivers/media/i2c/ov5693.c
++++ b/drivers/media/i2c/ov5693.c
+@@ -110,6 +110,10 @@
+ #define OV5693_MIN_CROP_WIDTH			2
+ #define OV5693_MIN_CROP_HEIGHT			2
+ 
++/* MIPI control */
++#define OV5693_MIPI_CTRL00_REG			CCI_REG8(0x4800)
++#define OV5693_MIPI_CTRL00_IPU6			0x2d
++
+ /* Test Pattern */
+ #define OV5693_TEST_PATTERN_REG			CCI_REG8(0x5e00)
+ #define OV5693_TEST_PATTERN_ENABLE		BIT(7)
+@@ -611,6 +615,19 @@ static int ov5693_enable_streaming(struct ov5693_device *ov5693, bool enable)
+ {
+ 	int ret = 0;
+ 
++	/*
++	 * Program MIPI_CTRL00 (CSI-2 clock-lane control) before starting the
++	 * stream. The 0x00 power-on default is accepted by the IPU3 ISP (where
++	 * this sensor is used on the Surface Pro 5-7) but leaves the IPU6 D-PHY
++	 * (Surface Pro 8/9, Surface Go 4) unable to lock onto the link: the
++	 * sensor streams yet the receiver gets no CSI-2 data and capture times
++	 * out. 0x2d matches the value the vendor (Windows) driver writes and
++	 * lets the IPU6 receive frames.
++	 */
++	if (enable)
++		cci_write(ov5693->regmap, OV5693_MIPI_CTRL00_REG,
++			  OV5693_MIPI_CTRL00_IPU6, &ret);
++
+ 	cci_write(ov5693->regmap, OV5693_SW_STREAM_REG,
+ 		  enable ? OV5693_START_STREAMING : OV5693_STOP_STREAMING,
+ 		  &ret);
