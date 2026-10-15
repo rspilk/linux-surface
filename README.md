@@ -1,5 +1,18 @@
 # Linux Surface
 
+> [!NOTE]
+> This is a personal fork of [linux-surface](https://github.com/linux-surface/linux-surface) that only builds the Fedora kernel (currently v7.2) for a Surface Pro 8.
+> It does not publish a package repository.
+> For everything else, use upstream.
+>
+> **Install:** download the RPMs from a `fedora-<version>-*` release and run `sudo dnf install ./kernel-surface-*.rpm`.
+> Disable the upstream `linux-surface` dnf repository first, so the two don't mix.
+>
+> **Secure Boot:** kernels are signed with this fork's own key.
+> Enroll [`pkg/keys/surface.cer`](pkg/keys/surface.cer) once with `sudo mokutil --import pkg/keys/surface.cer`, then reboot and confirm in MokManager.
+>
+> **Release:** bump `PACKAGE_TAG` / `PACKAGE_RELEASE` in `pkg/fedora/kernel-surface/build-linux-surface.py`, then run `scripts/tag-release.sh [fedora versions]`.
+
 Linux running on the Microsoft Surface devices.
 Follow the instructions below to install the latest kernel.
 
