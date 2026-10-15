@@ -1,9 +1,0 @@
-/kernel/archlinux-linux
-*/src
-*/pkg
-*/out
-*/*.pkg.tar.*
-*/*.install.pkg
-*/*.gz
-*/*.xz
-*/*.sign
