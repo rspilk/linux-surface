@@ -75,6 +75,8 @@ Check it with `sudo grubby --default-kernel`.
 
 For touch and pen input, also install `iptsd`.
 
+To get new kernels through `sudo dnf upgrade` instead, run the self-hosted mirror in [`contrib/dnf-mirror`](contrib/dnf-mirror).
+
 ## Build a release
 
 1. In `pkg/fedora/kernel-surface/build-linux-surface.py`, set `PACKAGE_TAG` to a [kernel-ark tag][ark-tags] such as `kernel-7.2.11-0`, and set `PACKAGE_RELEASE`.
@@ -114,6 +116,7 @@ When Fedora moves to a new kernel series (for example, 7.3):
 | `pkg/keys/` | Secure Boot certificate for this fork |
 | `.github/workflows/fedora-*.yml` | Build and release workflows, one per Fedora version |
 | `scripts/tag-release.sh` | Creates and pushes release tags |
+| `contrib/dnf-mirror/` | Self-hosted, signed dnf repository that mirrors the releases |
 
 Older patch directories (6.x) are kept from upstream for reference.
 
