@@ -1,135 +1,138 @@
-# Linux Surface
+# linux-surface for Surface Pro 8 on Fedora
 
-> [!NOTE]
-> This is a personal fork of [linux-surface](https://github.com/linux-surface/linux-surface) that only builds the Fedora kernel (currently v7.2) for a Surface Pro 8.
-> It does not publish a package repository.
-> For everything else, use upstream.
->
-> **Install:** download the RPMs from a `fedora-<version>-*` release and run `sudo dnf install ./kernel-surface-*.rpm`.
-> Disable the upstream `linux-surface` dnf repository first, so the two don't mix.
->
-> **Secure Boot:** kernels are signed with this fork's own key.
-> Enroll [`pkg/keys/surface.cer`](pkg/keys/surface.cer) once with `sudo mokutil --import pkg/keys/surface.cer`, then reboot and confirm in MokManager.
->
-> **Release:** bump `PACKAGE_TAG` / `PACKAGE_RELEASE` in `pkg/fedora/kernel-surface/build-linux-surface.py`, then run `scripts/tag-release.sh [fedora versions]`.
+This repository is a personal fork of [linux-surface][upstream].
+It builds one thing: a patched Fedora kernel (`kernel-surface`) for a Surface Pro 8, signed with this fork's own Secure Boot key.
 
-Linux running on the Microsoft Surface devices.
-Follow the instructions below to install the latest kernel.
+It exists because upstream's Fedora packages stopped at kernel 6.19.8, while Fedora moved to the 7.x series.
+For other devices, distributions, or user-space packages, use [upstream][upstream].
 
-[Announcements and Updates](https://github.com/linux-surface/linux-surface/issues/96) | [Upstream Status](https://github.com/linux-surface/linux-surface/issues/205)
+## Current status
 
-### Why / About this Project
+| | |
+|---|---|
+| Kernel | 7.2.11, built from Fedora's `kernel-ark` tag `kernel-7.2.11-0` |
+| Fedora | 43 (workflows for 44 and 45 exist but are untested) |
+| Device | Surface Pro 8 |
 
-These days, Linux supports a lot of devices out-of-the-box.
-As a matter of fact, this includes a good portion of the Microsoft Surface devices—for most parts at least.
-So why would you need a special kernel for Surface devices?
-In short, for the parts that are not supported upstream yet.
+Tested on the Surface Pro 8 with release `7.2.11-1`:
 
-Unfortunately, Surface devices tend to be a bit special.
-This is mostly because some hardware choices Microsoft made are rarely (if at all) used by other, more "standard", devices.
-For example:
-- Surface devices (4th generation and later) use their own embedded controller (the Surface Aggregator Module, or SAM).
-  In contrast to other devices, however, some newer Surface devices route their keyboard and touchpad input via this controller.
-  Unfortunately, every new Surface device requires some (usually small) patch to enable support for it, since devices managed by SAM are generally not auto-discoverable.
-- Surface devices (4th generation and later, excluding the Go series) use a rather special system for touch and pen input.
-  In short, this requires user-space processing of touch and pen data to enable multitouch support and has not been upstreamed yet.
-- Surface devices rely on Intel's ISP for camera image processing.
-  This means that the webcam also requires some user-space processing.
-  While patches are being upstreamed, not all devices are supported (even with this project), and more work remains to be done.
+| Feature | Status |
+|---|---|
+| Boot with Secure Boot | Works |
+| Touch and pen (ITHC + iptsd) | Works |
+| Type Cover | Works |
+| Wi-Fi, sound | Works |
+| Front camera | Detected and rotated correctly, but shows a black image (fix in `7.2.11-2`) |
+| Rear camera | Works, but upside down (fix in `7.2.11-2`) |
 
-We aim to send all the changes we make here upstream, but this may take time.
-This kernel allows us to ship new features faster, as we do not have to adhere to the upstream release schedule (and, for better or worse, code standards).
-We also rely on it to test and prototype patches before sending them upstream, which is crucial because we maintainers cannot test on all Surface devices (which also means we may break things along the way).
+## What's different from upstream
 
-_So should you install this custom kernel and the associated packages?_
-It depends: We generally recommend you try your standard distribution kernel first.
-If that works well for you, great!
-But if you're missing any features or experiencing issues, take a look at our [feature matrix](https://github.com/linux-surface/linux-surface/wiki/Supported-Devices-and-Features#feature-matrix) and give our kernel and packages a try.
-If your device is not listed as supported yet, feel free to open an issue.
+- **Kernel 7.2 patches** in `patches/7.2/`, from [linux-surface#2233][pr-2233], with `0013-cameras.patch` regenerated so it applies to Fedora's `kernel-ark` tree.
+- **Surface Pro 8 camera fixes** from [#2171][pr-2171] (front camera streaming) and [#2227][pr-2227] (rear camera rotation).
+- **Fedora only.** The Arch and Debian packaging, the package repository upload, and the autoupdate bots are removed.
+- **Own Secure Boot key.** Kernels are signed with the certificate in [`pkg/keys/surface.cer`](pkg/keys/surface.cer), not upstream's.
+- **Releases only.** RPMs are published as GitHub Releases. There's no dnf repository.
 
-### Supported Devices
+## Install
 
-* Surface Book
-* Surface Book 2
-* Surface Book 3
-* Surface 3
-* Surface Go
-* Surface Go 2
-* Surface Go 3
-* Surface Laptop
-* Surface Laptop 2
-* Surface Laptop 3
-* Surface Laptop 4
-* Surface Laptop 5
-* Surface Laptop 6
-* Surface Laptop Go
-* Surface Laptop Go 2
-* Surface Laptop Go 3
-* Surface Laptop Studio
-* Surface Laptop Studio 2
-* Surface Pro 1
-* Surface Pro 3
-* Surface Pro 4
-* Surface Pro (5th Gen) / Surface Pro 2017
-* Surface Pro 6
-* Surface Pro 7
-* Surface Pro 7+
-* Surface Pro 8
-* Surface Pro 9
-* Surface Pro 10
-* Surface Studio
+### 1. Enroll the Secure Boot certificate (once)
 
-### Features / What's Working
+```sh
+sudo mokutil --import pkg/keys/surface.cer
+```
 
-See the [feature matrix](https://github.com/linux-surface/linux-surface/wiki/Supported-Devices-and-Features#feature-matrix) for more information about each device.
+Set a one-time password, reboot, and in MokManager choose **Enroll MOK** → **Continue** → **Yes**, then enter the password.
 
-### Disclaimer
+### 2. Keep upstream from replacing the kernel
 
-* For the most part, things are tested on a Surface Book 2.
-  While most things are reportedly fully working on other devices, your mileage may vary.
-  Please look at the issues list for possible exceptions.
+If the upstream `linux-surface` dnf repository is configured (it's still useful for `iptsd`), add this line to its section in `/etc/yum.repos.d/linux-surface.repo`:
 
-## Installation and Setup
+```ini
+excludepkgs=kernel-surface*
+```
 
-We provide package repositories for the patched kernel and other utilities.
-Please refer to the [detailed installation and setup guide][wiki-setup].
-There, you may also find device-specific caveats.
-In case you have disk encryption set up or plan to use it, take care to follow the respective instructions in the installation guide and have a look at the respective [wiki page][wiki-encryption].
-After installation, you may want to have a look at the [wiki][wiki] and the `contrib/` directory for useful tweaks.
+### 3. Install the RPMs
 
-If you want to compile the kernel yourself (e.g. if your distribution is not supported), please have a look at the [wiki][wiki-compiling].
+Download the RPMs from a `fedora-<fedora version>-<kernel version>-<release>` release on the [Releases](../../releases) page, then install these packages from the download folder:
 
-## Additional Information
+```sh
+V=7.2.11-2.surface.fc43.x86_64
+sudo dnf install \
+  ./kernel-surface-$V.rpm \
+  ./kernel-surface-core-$V.rpm \
+  ./kernel-surface-modules-$V.rpm \
+  ./kernel-surface-modules-core-$V.rpm \
+  ./kernel-surface-modules-extra-$V.rpm \
+  ./kernel-surface-devel-$V.rpm \
+  ./kernel-surface-default-watchdog-$V.rpm
+```
 
-### Notes
+Don't install the `*-matched` or `*-internal` packages.
+The `-matched` ones require matching packages for every older `kernel-surface` you have installed, which fails when upstream's repository is excluded.
 
-* If you are getting stuck at boot when loading the ramdisk, you need to install the Processor Microcode Firmware for Intel CPUs (usually found under Additional Drivers in Software and Updates).
-* Using TLP can cause slowdowns, laggy performance, and occasional hangs if not configured properly! You have been warned.
-* If you want to use hibernate instead of suspend, you need to create a swap partition or file, please follow your distribution's instructions (or [here][hibernate-setup]).
+The `default-watchdog` package keeps the newest `kernel-surface` as the default boot entry.
+Check it with `sudo grubby --default-kernel`.
 
-### Support
+For touch and pen input, also install `iptsd`.
 
-If you have questions or need support, please join our [Matrix Space][matrix-space]!
-This space contains
-- a [support channel][matrix-support] for general support and
-- a [development channel][matrix-development] for all development related questions and discussions.
+## Build a release
+
+1. In `pkg/fedora/kernel-surface/build-linux-surface.py`, set `PACKAGE_TAG` to a [kernel-ark tag][ark-tags] such as `kernel-7.2.11-0`, and set `PACKAGE_RELEASE`.
+   Use release `1` for a new kernel version, and increase it for rebuilds.
+2. Commit and push to `main`.
+3. Tag and push the release:
+
+   ```sh
+   bash scripts/tag-release.sh 43
+   ```
+
+   This creates the tag `fedora-43-<version>-<release>`, which starts the **Fedora 43** workflow.
+   The build takes about 1 hour 40 minutes, and the RPMs appear on the Releases page.
+   With no arguments, the script tags the Fedora version of the machine it runs on.
+
+The workflow needs the repository secret `SURFACE_SB_KEY`: the base64-encoded private key that matches `pkg/keys/surface.crt`.
+Without it, the kernel is signed with Red Hat test keys and won't boot with Secure Boot on.
+
+### Moving to a new kernel version
+
+When Fedora moves to a new kernel series (for example, 7.3):
+
+1. Add `patches/<version>/` and `configs/surface-<version>.config`, usually from the matching upstream pull request.
+2. Check that the patches apply with `git am -3` to the new `kernel-ark` tag.
+   Fedora's tree carries backports that stable kernels don't have, so patches that apply to stable can still fail here.
+3. In `0010-surface-typecover.patch` and `0015-hid-surface.patch`, check the hid-multitouch class IDs and quirk bits, and in `0003-mwifiex.patch` the btusb `driver_info` bits, against the new kernel's values.
+   Collisions compile without errors and break things silently.
+4. Rebase `pkg/fedora/kernel-surface/patches/` if the `kernel-ark` spec file changed.
+
+## Repository layout
+
+| Path | Contents |
+|---|---|
+| `patches/<version>/` | Surface kernel patches, one file per feature area |
+| `configs/` | Kernel config fragments merged into Fedora's config |
+| `pkg/fedora/kernel-surface/` | Build scripts and `kernel-ark` spec patches |
+| `pkg/keys/` | Secure Boot certificate for this fork |
+| `.github/workflows/fedora-*.yml` | Build and release workflows, one per Fedora version |
+| `scripts/tag-release.sh` | Creates and pushes release tags |
+
+Older patch directories (6.x) are kept from upstream for reference.
+
+## Credits
+
+The patches and packaging come from the [linux-surface][upstream] project and its contributors.
+The 7.x port is from Apiznel ([#2233][pr-2233]), with fixes collected in [orthogonaleety/linux-surface][ortho].
+The camera fixes are from Arsalan Naeem ([#2171][pr-2171]) and Eva Dixon ([#2227][pr-2227]).
 
 ## License
+
 This repository contains patches, which are either derivative work targeting a specific already licensed source, i.e. parts of the Linux kernel, or introduce new parts to the Linux kernel.
 These patches fall thus, if not explicitly stated otherwise, under the license of the source they are targeting, or if they introduce new code, the license they explicitly specify inside of the patch.
 Please refer to the specific patch and source in question for further information.
 License texts can be obtained at https://github.com/torvalds/linux/tree/master/LICENSES.
 
-[wiki]: https://github.com/linux-surface/linux-surface/wiki
-[wiki-setup]: https://github.com/linux-surface/linux-surface/wiki/Installation-and-Setup
-[wiki-compiling]: https://github.com/linux-surface/linux-surface/wiki/Compiling-the-Kernel-from-Source
-[wiki-encryption]: https://github.com/linux-surface/linux-surface/wiki/Disk-Encryption
-
-[matrix-space]: https://matrix.to/#/#linux-surface:matrix.org
-[matrix-support]: https://matrix.to/#/#linux-surface-support:matrix.org
-[matrix-development]: https://matrix.to/#/#linux-surface-development:matrix.org
-
-[hibernate-setup]: https://fitzcarraldoblog.wordpress.com/2018/07/14/configuring-lubuntu-18-04-to-enable-hibernation-using-a-swap-file
-[releases]: https://github.com/linux-surface/linux-surface/releases
-
-[linux-surface-kernel]: https://github.com/linux-surface/kernel/
+[upstream]: https://github.com/linux-surface/linux-surface
+[ortho]: https://github.com/orthogonaleety/linux-surface
+[pr-2171]: https://github.com/linux-surface/linux-surface/pull/2171
+[pr-2227]: https://github.com/linux-surface/linux-surface/pull/2227
+[pr-2233]: https://github.com/linux-surface/linux-surface/pull/2233
+[ark-tags]: https://gitlab.com/cki-project/kernel-ark/-/tags
