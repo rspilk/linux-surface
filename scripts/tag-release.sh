@@ -21,41 +21,6 @@ tag()
     git push --force origin "${DISTRO}-${VERSION}"
 }
 
-getarch()
-{
-    VERSION="$(grep 'pkgver=' pkg/arch/kernel/PKGBUILD | cut -d'=' -f2 | cut -d'.' -f1-3)"
-    RELEASE="$(grep 'pkgrel=' pkg/arch/kernel/PKGBUILD | cut -d'=' -f2)"
-
-    if [ -z "${VERSION}" ]; then
-        echo "VERSION missing!"
-        return 1
-    fi
-
-    if [ -z "${RELEASE}" ]; then
-        echo "RELEASE missing!"
-        return 1
-    fi
-
-    echo "${VERSION}-${RELEASE}"
-}
-
-getdebian()
-{
-    . pkg/debian/kernel/version.conf
-
-    if [ -z "${KERNEL_VERSION}" ]; then
-        echo "KERNEL_VERSION missing!"
-        return 1
-    fi
-
-    if [ -z "${KERNEL_REVISION}" ]; then
-        echo "KERNEL_REVISION missing!"
-        return 1
-    fi
-
-    echo "${KERNEL_VERSION}-${KERNEL_REVISION}"
-}
-
 getfedoravar()
 {
     VAR="${1:-}"
@@ -86,7 +51,10 @@ getfedora()
     echo "${VERSION}-${RELEASE}"
 }
 
-tag 'arch' "$(getarch)"
-tag 'debian' "$(getdebian)"
-tag 'fedora-40' "$(getfedora)"
-tag 'fedora-41' "$(getfedora)"
+# Tag the Fedora releases given as arguments, or the one this machine runs.
+# Each tag triggers a full kernel build, so only tag what you need.
+FEDORA_VERSIONS="${*:-$(. /etc/os-release && echo "${VERSION_ID}")}"
+
+for FEDORA in ${FEDORA_VERSIONS}; do
+    tag "fedora-${FEDORA}" "$(getfedora)"
+done
