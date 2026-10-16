@@ -122,6 +122,7 @@ gpgcheck=1
 repo_gpgcheck=1
 gpgkey={REPO_URL}/{KEY_FILE}
 skip_if_unavailable=True
+metadata_expire=1h
 """)
 
 
