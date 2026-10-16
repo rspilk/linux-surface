@@ -14,7 +14,7 @@ For other devices, distributions, or user-space packages, use [upstream][upstrea
 | Fedora | 43 (workflows for 44 and 45 exist but are untested) |
 | Device | Surface Pro 8 |
 
-Tested on the Surface Pro 8 with release `7.2.11-1`:
+Tested on the Surface Pro 8 with release `7.2.11-2`:
 
 | Feature | Status |
 |---|---|
@@ -22,13 +22,24 @@ Tested on the Surface Pro 8 with release `7.2.11-1`:
 | Touch and pen (ITHC + iptsd) | Works |
 | Type Cover | Works |
 | Wi-Fi, sound | Works |
-| Front camera | Detected and rotated correctly, but shows a black image (fix in `7.2.11-2`) |
-| Rear camera | Works, but upside down (fix in `7.2.11-2`) |
+| Front camera | Works, upright. Colour needs a libcamera tuning file (see below) |
+| Rear camera | Works, upright, but red and blue are swapped (fix in `7.2.11-3`) |
+
+### Camera colour
+
+The cameras go through libcamera's software ISP, which needs a tuning file per sensor for good colour.
+For the front camera (OV5693), use the tuning file from [linux-surface#2302][pr-2302]:
+
+- **libcamera 0.7.2 or newer (Fedora 44+):** copy its `ov5693.yaml` to `~/.config/libcamera/ipa/simple/`.
+- **libcamera 0.5.2 (Fedora 43):** 0.5.2 doesn't know the file's `Adjust` step and doesn't read `~/.config`.
+  Replace `- Adjust:` with `- Lut:` and copy it to `/usr/share/libcamera/ipa/simple/ov5693.yaml`, then run `systemctl --user restart wireplumber`.
+
+There's no tuning file for the rear camera (OV13858) yet.
 
 ## What's different from upstream
 
 - **Kernel 7.2 patches** in `patches/7.2/`, from [linux-surface#2233][pr-2233], with `0013-cameras.patch` regenerated so it applies to Fedora's `kernel-ark` tree.
-- **Surface Pro 8 camera fixes** from [#2171][pr-2171] (front camera streaming) and [#2227][pr-2227] (rear camera rotation).
+- **Surface Pro 8 camera fixes** from [#2171][pr-2171] (front camera streaming) and [#2227][pr-2227] (rear camera rotation), plus a fix for #2227 swapping red and blue on the rear camera.
 - **Fedora only.** The Arch and Debian packaging, the package repository upload, and the autoupdate bots are removed.
 - **Own Secure Boot key.** Kernels are signed with the certificate in [`pkg/keys/surface.cer`](pkg/keys/surface.cer), not upstream's.
 - **Releases only.** RPMs are published as GitHub Releases. There's no dnf repository.
@@ -56,7 +67,7 @@ excludepkgs=kernel-surface*
 Download the RPMs from a `fedora-<fedora version>-<kernel version>-<release>` release on the [Releases](../../releases) page, then install these packages from the download folder:
 
 ```sh
-V=7.2.11-2.surface.fc43.x86_64
+V=7.2.11-3.surface.fc43.x86_64
 sudo dnf install \
   ./kernel-surface-$V.rpm \
   ./kernel-surface-core-$V.rpm \
@@ -138,4 +149,5 @@ License texts can be obtained at https://github.com/torvalds/linux/tree/master/L
 [pr-2171]: https://github.com/linux-surface/linux-surface/pull/2171
 [pr-2227]: https://github.com/linux-surface/linux-surface/pull/2227
 [pr-2233]: https://github.com/linux-surface/linux-surface/pull/2233
+[pr-2302]: https://github.com/linux-surface/linux-surface/pull/2302
 [ark-tags]: https://gitlab.com/cki-project/kernel-ark/-/tags
