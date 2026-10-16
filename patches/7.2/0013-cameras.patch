@@ -1381,3 +1381,89 @@ index 6f17599ac..e17c91dc2 100644
  	{} /* Terminating entry */
  };
  
+
+From 51bb86d084f863d11c6365735020c6c4345506c8 Mon Sep 17 00:00:00 2001
+From: rspilk <432044+rspilk@users.noreply.github.com>
+Date: Thu, 15 Oct 2026 18:12:53 -0700
+Subject: [PATCH] media: i2c: ov13858: Don't move the crop window when flipping
+
+The Surface Pro 8 rear OV13858 keeps its GRBG Bayer order when mirrored
+or flipped. Moving the crop window by one pixel per flip shifted the
+pattern instead, so with both flips set for its 180 degree mounting,
+red and blue came out swapped: a blue crayon line on white paper showed
+as orange.
+
+Keep the flips and leave the crop window alone.
+
+Tested on a Surface Pro 8 with libcamera 0.5.2 (software ISP): with
+the window shift the line came out orange, without it blue, same scene.
+
+Patchset: cameras
+---
+ drivers/media/i2c/ov13858.c | 30 ++++++++----------------------
+ 1 file changed, 8 insertions(+), 22 deletions(-)
+
+diff --git a/drivers/media/i2c/ov13858.c b/drivers/media/i2c/ov13858.c
+index 879227013..d00c33eb3 100644
+--- a/drivers/media/i2c/ov13858.c
++++ b/drivers/media/i2c/ov13858.c
+@@ -83,12 +83,10 @@
+ #define OV13858_TEST_PATTERN_ENABLE	BIT(7)
+ #define OV13858_TEST_PATTERN_MASK	0xfc
+ 
+-/* Flip control, and the crop window offsets that keep the Bayer order */
++/* Flip control */
+ #define OV13858_REG_FORMAT1		0x3820
+ #define OV13858_FORMAT1_HFLIP_OFF	BIT(3)
+ #define OV13858_FORMAT1_VFLIP		(BIT(4) | BIT(5))
+-#define OV13858_REG_H_WIN_OFFSET	0x3811
+-#define OV13858_REG_V_WIN_OFFSET	0x3813
+ 
+ /* Number of frames to skip */
+ #define OV13858_NUM_OF_SKIP_FRAMES	2
+@@ -1364,38 +1362,26 @@ static int ov13858_update_reg(struct ov13858 *ov13858, u16 reg,
+ }
+ 
+ /*
+- * Mirroring and flipping each shift the Bayer order by one pixel. Moving the
+- * crop window by one pixel shifts it back, so the format stays GRBG and the
+- * flips can be left without V4L2_CTRL_FLAG_MODIFY_LAYOUT.
++ * The sensor keeps its GRBG Bayer order when mirrored or flipped, so the
++ * flips can be left without V4L2_CTRL_FLAG_MODIFY_LAYOUT and the crop window
++ * stays where the mode table put it.
+  */
+ static int ov13858_set_hflip(struct ov13858 *ov13858, u32 enable)
+ {
+-	int ret;
+-
+ 	if (!enable)
+ 		return 0;
+ 
+-	ret = ov13858_update_reg(ov13858, OV13858_REG_FORMAT1,
+-				 0, OV13858_FORMAT1_HFLIP_OFF, 0);
+-	if (ret)
+-		return ret;
+-
+-	return ov13858_update_reg(ov13858, OV13858_REG_H_WIN_OFFSET, 0, 0, 1);
++	return ov13858_update_reg(ov13858, OV13858_REG_FORMAT1,
++				  0, OV13858_FORMAT1_HFLIP_OFF, 0);
+ }
+ 
+ static int ov13858_set_vflip(struct ov13858 *ov13858, u32 enable)
+ {
+-	int ret;
+-
+ 	if (!enable)
+ 		return 0;
+ 
+-	ret = ov13858_update_reg(ov13858, OV13858_REG_FORMAT1,
+-				 OV13858_FORMAT1_VFLIP, 0, 0);
+-	if (ret)
+-		return ret;
+-
+-	return ov13858_update_reg(ov13858, OV13858_REG_V_WIN_OFFSET, 0, 0, -1);
++	return ov13858_update_reg(ov13858, OV13858_REG_FORMAT1,
++				  OV13858_FORMAT1_VFLIP, 0, 0);
+ }
+ 
+ static int ov13858_set_ctrl(struct v4l2_ctrl *ctrl)
