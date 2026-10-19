@@ -11,7 +11,7 @@ For other devices, distributions, or user-space packages, use [upstream][upstrea
 | | |
 |---|---|
 | Kernel | 7.2.11, built from Fedora's `kernel-ark` tag `kernel-7.2.11-0` |
-| Fedora | 43 (workflows for 44 and 45 exist but are untested) |
+| Fedora | 43; 44 builds, untested on hardware (the workflow for 45 is untested) |
 | Device | Surface Pro 8 |
 
 Tested on the Surface Pro 8 with release `7.2.11-2`:
@@ -90,6 +90,9 @@ To get new kernels through `sudo dnf upgrade` instead, run the self-hosted mirro
 
 ## Build a release
 
+For day-to-day maintenance, including patch fixes, new kernel series, and Fedora upgrades, see [MAINTAINING.md](MAINTAINING.md).
+`scripts/surface-kernel.sh` automates the steps below.
+
 1. In `pkg/fedora/kernel-surface/build-linux-surface.py`, set `PACKAGE_TAG` to a [kernel-ark tag][ark-tags] such as `kernel-7.2.11-0`, and set `PACKAGE_RELEASE`.
    Use release `1` for a new kernel version, and increase it for rebuilds.
 2. Commit and push to `main`.
@@ -127,6 +130,8 @@ When Fedora moves to a new kernel series (for example, 7.3):
 | `pkg/keys/` | Secure Boot certificate for this fork |
 | `.github/workflows/fedora-*.yml` | Build and release workflows, one per Fedora version |
 | `scripts/tag-release.sh` | Creates and pushes release tags |
+| `scripts/surface-kernel.sh` | Checks, builds, releases, and installs kernels (`help` lists the commands) |
+| `MAINTAINING.md` | Maintenance runbook |
 | `contrib/dnf-mirror/` | Self-hosted, signed dnf repository that mirrors the releases |
 
 Older patch directories (6.x) are kept from upstream for reference.
