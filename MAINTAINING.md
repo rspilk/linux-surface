@@ -186,6 +186,7 @@ If `system-upgrade` reports a kernel conflict, add `--allowerasing` only after r
 | "bad shim signature" or Secure Boot error | The kernel isn't signed with this fork's key. Check with `surface-kernel.sh verify <version>`. Usually the `SURFACE_SB_KEY` secret is missing or wrong in GitHub. |
 | VirtualBox, v4l2loopback, or another kmod missing after an update | `surface-kernel.sh kmods`. akmods doesn't retry on its own after a failed install. |
 | Touch doesn't work | `systemctl status 'iptsd@*'` and `journalctl -b -u 'iptsd@*'`. Downgrade with `sudo dnf downgrade iptsd` if a new version broke it. |
+| GNOME doesn't start; journal shows `libwacom ... bus_to_str: code should not be reached` | Stock `libwacom` replaced `libwacom-surface`. From a TTY (Ctrl+Alt+F3): `sudo dnf install --allowerasing libwacom-surface libwacom-surface-data`, then `sudo systemctl restart gdm`. Keep `libwacom-surface*` allowed in the upstream repository. |
 | A stock Fedora kernel shows up in an update | Check `excludepkgs` in `/etc/dnf/repos.override.d/99-config_manager.repo`. |
 | Upstream linux-surface repository offers its kernel | Its section in `/etc/yum.repos.d/linux-surface.repo` needs `excludepkgs=kernel-surface*` (or `includepkgs=iptsd`). |
 | CI build fails | Open the run from `surface-kernel.sh status` and search the log for `error:`. Compile errors usually mean a patch applied but no longer fits the new kernel's code. |
