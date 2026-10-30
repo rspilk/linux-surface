@@ -190,4 +190,5 @@ If `system-upgrade` reports a kernel conflict, add `--allowerasing` only after r
 | A stock Fedora kernel shows up in an update | Check `excludepkgs` in `/etc/dnf/repos.override.d/99-config_manager.repo`. |
 | Upstream linux-surface repository offers its kernel | Its section in `/etc/yum.repos.d/linux-surface.repo` needs `excludepkgs=kernel-surface*` (or `includepkgs=iptsd`). |
 | CI build fails | Open the run from `surface-kernel.sh status` and search the log for `error:`. Compile errors usually mean a patch applied but no longer fits the new kernel's code. |
+| CI fails at the end of "Build packages" with `Allocation of hmac(sha512) cipher failed` | The runner's kernel can't compute `sha512hmac` for the build container. The build job is pinned to `ubuntu-24.04` for this reason. If that image is retired, try `ubuntu-latest` again. |
 | Camera picture is upside down after another app used it | libcamera resets the sensor flips when a second program opens the camera. Close every camera app and reopen one. |

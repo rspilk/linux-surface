@@ -15,7 +15,8 @@ on:
 jobs:
   build:
     name: Build Kernel
-    runs-on: ubuntu-latest
+    # shortcut: sha512hmac (AF_ALG) fails in the container on the Ubuntu 26 runner kernel; move off 24.04 once that works or before 24.04 is retired
+    runs-on: ubuntu-24.04
     steps:
       - name: Checkout code
         uses: actions/checkout@v6
